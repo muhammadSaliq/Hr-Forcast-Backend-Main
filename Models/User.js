@@ -51,6 +51,7 @@ const employeeSchema = new mongoose.Schema({
 export const employeeModel = mongoose.model('EmployeeAll', employeeSchema);
 
 
+
 const User = mongoose.model('User', userSchema);
 mongoose.connect(mongodbURI);
 ////////////////mongodb connected disconnected events///////////////////////////////////////////////
