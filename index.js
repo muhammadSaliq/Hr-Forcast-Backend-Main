@@ -14,6 +14,7 @@ import bucket from "./Bucket/Firebase.js";
 import fs from "fs";
 import path from "path";
 import { employeeModel } from "./Models/User.js";
+import { departmentModel } from "./Models/User.js";
 
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
@@ -36,6 +37,7 @@ app.get("/", (req, res) => {
   res.send("Final Year Project ");
 });
 
+//users
 app.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -186,6 +188,98 @@ app.post("/addemployee", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get("/allemployees", async (req, res) => {
+  try {
+    const result = await employeeModel.find().exec(); // Using .exec() to execute the query
+    // console.log(result);
+    res.send({
+      message: "Got all employee successfully",
+      data: result,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      message: "Server error",
+    });
+  }
+});
+
+//department
+app.post("/adddepartments", async (req, res) => {
+
+  try {
+    const { departmentname  } = req.body;
+    const existingUser = await departmentModel.findOne({ departmentname });
+
+    if (existingUser) {
+      return res.status(400).json({ error: "Email already exists" });
+    }
+ 
+    const newDepartment = new departmentModel({
+      departmentname,
+      
+    });
+
+    await newDepartment.save();
+
+    res.status(201).json({ message: "Department Added successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+app.get("/alldepartments", async (req, res) => {
+  try {
+    const result = await departmentModel.find().exec(); // Using .exec() to execute the query
+    // console.log(result);
+    res.send({
+      message: "Got all department successfully",
+      data: result,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      message: "Server error",
+    });
+  }
+});
+
+// display employee by department
+app.get("/deaprtmentemployee/:department", async (req, res) => {
+  let body = req.body;
+  const Department = req.params.department;
+  try {
+    const result = await employeeModel.find({department : Department}).exec(); // Using .exec() to execute the query
+    console.log(Department);
+    res.send({
+      message: "Got all Emloyees successfully",
+      data: result,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      message: "Server error",
+    });
+  }
+});
+app.get("/employeedetails/:id", async (req, res) => {
+  let body = req.body;
+  const ID = req.params.id;
+  try {
+    const result = await employeeModel.findOne({_id : ID}).exec(); // Using .exec() to execute the query
+    console.log(ID);
+    res.send({
+      message: "Got Emloyees successfully",
+      data: result,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      message: "Server error",
+    });
   }
 });
 // Start the server

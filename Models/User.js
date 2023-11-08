@@ -10,6 +10,13 @@ const userSchema = new mongoose.Schema({
 
 });
 
+const departmentSchema = new mongoose.Schema({
+    departmentname: String,
+    createdOn: { type: Date, default: Date.now },
+  
+  });
+export const departmentModel = mongoose.model('departments', departmentSchema);
+
 const employeeSchema = new mongoose.Schema({
     emloyeename : { type: String },
     age : { type: String },
