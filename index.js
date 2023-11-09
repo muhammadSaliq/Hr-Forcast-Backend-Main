@@ -136,7 +136,7 @@ app.post("/login", async (req, res) => {
 app.post("/addemployee", async (req, res) => {
   try {
     const { emloyeename, age, businessTravel,dailyRate,department , distanceFromHome, education,educationField,
-      employeeCount,employeeNumber, environmentSatisfaction,gender,hourlyRate,jobInvolvement, jobLevel,jobRole,jobSatisfaction,maritalStatus,
+      employeeNumber, environmentSatisfaction,gender,hourlyRate,jobInvolvement, jobLevel,jobRole,jobSatisfaction,maritalStatus,
       monthlyIncome,monthlyRate,numCompaniesWorked,over18, overTime, percentSalaryHike, performanceRating,relationshipSatisfaction,standardHours,
       stockOptionLevel, totalWorkingYears,trainingTimesLastYear, workLifeBalance,yearsAtCompany,yearsInCurrentRole,yearsSinceLastPromotion,yearsWithCurrManager
     } = req.body;
@@ -152,7 +152,7 @@ app.post("/addemployee", async (req, res) => {
       distanceFromHome,
       education,
       educationField,
-      employeeCount,
+      
       employeeNumber,
       environmentSatisfaction,
       gender,

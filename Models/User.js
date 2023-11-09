@@ -26,7 +26,7 @@ const employeeSchema = new mongoose.Schema({
     distanceFromHome : { type: String },
     education : { type: String },
     educationField: { type: String  },
-    employeeCount : { type: String },
+    employeeCount : { type: String, default: "1" },
     employeeNumber: { type: String   },
     environmentSatisfaction: { type: String  },
     gender : { type: String },
@@ -53,6 +53,7 @@ const employeeSchema = new mongoose.Schema({
     yearsInCurrentRole : { type: String },
     yearsSinceLastPromotion: { type: String   },
     yearsWithCurrManager: { type: String  },
+    executive: { type: String , default: "1" },
     createdOn: { type: Date, default: Date.now },
 });
 export const employeeModel = mongoose.model('EmployeeAll', employeeSchema);
