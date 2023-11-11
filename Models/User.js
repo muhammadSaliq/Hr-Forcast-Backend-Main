@@ -54,7 +54,8 @@ const employeeSchema = new mongoose.Schema({
     yearsSinceLastPromotion: { type: String   },
     yearsWithCurrManager: { type: String  },
     executive: { type: String , default: "1" },
-    createdOn: { type: Date, default: Date.now },
+    CreatedbyUser: { type: String   },
+        createdOn: { type: Date, default: Date.now },
 });
 export const employeeModel = mongoose.model('EmployeeAll', employeeSchema);
 
