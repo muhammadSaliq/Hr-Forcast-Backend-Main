@@ -12,6 +12,10 @@ const userSchema = new mongoose.Schema({
 
 const departmentSchema = new mongoose.Schema({
     departmentname: String,
+    contact: String,
+    departmentmanager: String,
+    description: String,
+    executive: { type: String , default: "1" },
     createdOn: { type: Date, default: Date.now },
   
   });

@@ -207,13 +207,61 @@ app.get("/allemployees", async (req, res) => {
       message: "Server error",
     });
   }
+});app.put("/editemployee/:id", async (req,res) => {
+
+  const employeeId = req.params.id;
+  const updatedEmloyeeData = req.body;
+
+  try{
+  const employeeData = await employeeModel.findByIdAndUpdate(employeeId, updatedEmloyeeData, {
+    new: true, // Return the updated employeeData
+  });
+  if (!employeeData) {
+    return res.status(404).json({ message: 'employee Data not found' });
+  }
+
+  res.json(product);
+}
+catch {
+  res.status(500).json({ message: 'Server Error' });
+}
+
+
+});
+
+app.get("/deleteemployee/:id", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const FindData = await employeeModel.findById({ _id: id });
+
+    if (FindData) {
+     // FindData.isApproved = true;
+   await FindData.updateOne({ executive: "0" });
+      res.send({
+        message: "Employee deleted successfully",
+        data : FindData,
+      });
+    } else {
+      res.status(404).send({
+        message: "No Employee found with this id: " + id,
+      });
+    }
+    console.log("data",FindData);
+    console.log("id",id);
+  } catch (err) {
+    res.status(500).send({
+      message: "Server error",
+    });
+  }
+
 });
 
 //department
 app.post("/adddepartments", async (req, res) => {
 
   try {
-    const { departmentname  } = req.body;
+    const { departmentname, contact, departmentmanager, description  } = req.body;
     const existingUser = await departmentModel.findOne({ departmentname });
 
     if (existingUser) {
@@ -222,6 +270,9 @@ app.post("/adddepartments", async (req, res) => {
  
     const newDepartment = new departmentModel({
       departmentname,
+      contact,
+      departmentmanager,
+      description
       
     });
 
@@ -248,7 +299,88 @@ app.get("/alldepartments", async (req, res) => {
     });
   }
 });
+app.get("/geteditdepaprtment/:id", async (req,res) => {     
 
+  const DepId = req.params.id;
+  const department = await departmentModel.findOne({_id:DepId});
+
+  res.send({message: "customer found", Product : department})
+});
+app.put("/editdepartment/:id", async (req,res) => {
+
+  const depId = req.params.id;
+  const updatedDepartmentData = req.body;
+
+  try{
+  const departmentData = await departmentModel.findByIdAndUpdate(depId, updatedDepartmentData, {
+    new: true, // Return the updated departmentData
+  });
+  if (!departmentData) {
+    return res.status(404).json({ message: 'department Data not found' });
+  }
+
+  res.json(departmentData);
+}
+catch {
+  res.status(500).json({ message: 'Server Error' });
+}
+
+
+});
+app.get("/deletedepartment/:id", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const FindData = await departmentModel.findById({ _id: id });
+
+    if (FindData) {
+     // FindData.isApproved = true;
+   await FindData.updateOne({ executive: "0" });
+      res.send({
+        message: "Department deleted successfully",
+        data : FindData,
+      });
+    } else {
+      res.status(404).send({
+        message: "No Department found with this id: " + id,
+      });
+    }
+    console.log("data",FindData);
+    console.log("id",id);
+  } catch (err) {
+    res.status(500).send({
+      message: "Server error",
+    });
+  }
+
+});
+app.get("/activedepartment/:id", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const FindData = await departmentModel.findById({ _id: id });
+
+    if (FindData) {
+     // FindData.isApproved = true;
+   await FindData.updateOne({ executive: "1" });
+      res.send({
+        message: "Department deleted successfully",
+        data : FindData,
+      });
+    } else {
+      res.status(404).send({
+        message: "No Department found with this id: " + id,
+      });
+    }
+    console.log("data",FindData);
+    console.log("id",id);
+  } catch (err) {
+    res.status(500).send({
+      message: "Server error",
+    });
+  }
+
+});
 // display employee by department
 app.get("/deaprtmentemployee/:department", async (req, res) => {
   let body = req.body;
