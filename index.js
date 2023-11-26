@@ -206,12 +206,20 @@ app.get("/allemployees", async (req, res) => {
     res.status(500).send({
       message: "Server error",
     });
+
   }
+  app.get("/geteditemployee/:id", async (req,res) => {     
+
+    const EmpId = req.params.id;
+    const Employee = await employeeModel.findOne({_id:EmpId});
+  
+    res.send({message: "customer found", Product : Employee})
+  });
 });app.put("/editemployee/:id", async (req,res) => {
 
   const employeeId = req.params.id;
   const updatedEmloyeeData = req.body;
-
+console.log("empid",employeeId)
   try{
   const employeeData = await employeeModel.findByIdAndUpdate(employeeId, updatedEmloyeeData, {
     new: true, // Return the updated employeeData
