@@ -195,7 +195,7 @@ app.post("/addemployee", async (req, res) => {
 
 app.get("/allemployees", async (req, res) => {
   try {
-    const result = await employeeModel.find().exec(); // Using .exec() to execute the query
+    const result = await employeeModel.find({ executive: "1" }).exec(); // Using .exec() to execute the query
     // console.log(result);
     res.send({
       message: "Got all employee successfully",
@@ -335,18 +335,27 @@ catch {
 
 
 });
-app.get("/deletedepartment/:id", async (req, res) => {
+app.get("/deletedepartment/:id/:name", async (req, res) => {
   const id = req.params.id;
-
+  const name = req.params.name;
+console.log("dep", name)
   try {
     const FindData = await departmentModel.findById({ _id: id });
+    const result = await employeeModel.find({department : name}).exec();
+    console.log("res", result)
 
     if (FindData) {
      // FindData.isApproved = true;
    await FindData.updateOne({ executive: "0" });
+   await employeeModel.updateMany(
+    { department: name },
+    { $set: { executive: "0" } }
+  );
+
       res.send({
         message: "Department deleted successfully",
         data : FindData,
+        res: result
       });
     } else {
       res.status(404).send({
@@ -362,8 +371,9 @@ app.get("/deletedepartment/:id", async (req, res) => {
   }
 
 });
-app.get("/activedepartment/:id", async (req, res) => {
+app.get("/activedepartment/:id/:name", async (req, res) => {
   const id = req.params.id;
+  const name = req.params.name;
 
   try {
     const FindData = await departmentModel.findById({ _id: id });
@@ -371,6 +381,10 @@ app.get("/activedepartment/:id", async (req, res) => {
     if (FindData) {
      // FindData.isApproved = true;
    await FindData.updateOne({ executive: "1" });
+   await employeeModel.updateMany(
+    { department: name },
+    { $set: { executive: "1" } }
+  );
       res.send({
         message: "Department deleted successfully",
         data : FindData,
