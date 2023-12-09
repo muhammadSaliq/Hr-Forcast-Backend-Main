@@ -208,6 +208,23 @@ app.get("/allemployees", async (req, res) => {
     });
 
   }
+});
+app.get("/allemployeesbench", async (req, res) => {
+  try {
+    const result = await employeeModel.find({ executive: "0" }).exec(); // Using .exec() to execute the query
+    // console.log(result);
+    res.send({
+      message: "Got all employee successfully",
+      data: result,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      message: "Server error",
+    });
+
+  }
+});
   app.get("/geteditemployee/:id", async (req,res) => {     
 
     const EmpId = req.params.id;
@@ -215,11 +232,14 @@ app.get("/allemployees", async (req, res) => {
   
     res.send({message: "customer found", Product : Employee})
   });
-});app.put("/editemployee/:id", async (req,res) => {
+app.put("/editemployee/:id", async (req,res) => {
 
   const employeeId = req.params.id;
   const updatedEmloyeeData = req.body;
+  const UpdatedbyUser = req.body.UpdatedbyUser
 console.log("empid",employeeId)
+console.log("upsr",UpdatedbyUser)
+
   try{
   const employeeData = await employeeModel.findByIdAndUpdate(employeeId, updatedEmloyeeData, {
     new: true, // Return the updated employeeData

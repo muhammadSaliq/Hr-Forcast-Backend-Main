@@ -57,8 +57,17 @@ const employeeSchema = new mongoose.Schema({
     yearsInCurrentRole : { type: String },
     yearsSinceLastPromotion: { type: String   },
     yearsWithCurrManager: { type: String  },
+
+        vacationleave: { type: String , default: "0" },
+    sickleave: { type: String , default: "0" },
+    personalleave: { type: String , default: "0" },
+    latearrivals: { type: String , default: "0" },
+    lateleaving: { type: String , default: "0" },
+
     executive: { type: String , default: "1" },
     CreatedbyUser: { type: String   },
+    UpdatedbyUser: { type: String   },
+    updatedtime: { type: String   },
         createdOn: { type: Date, default: Date.now },
 });
 export const employeeModel = mongoose.model('EmployeeAll', employeeSchema);
