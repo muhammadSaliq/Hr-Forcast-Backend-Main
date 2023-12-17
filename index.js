@@ -16,7 +16,10 @@ import path from "path";
 import { employeeModel } from "./Models/User.js";
 import { departmentModel } from "./Models/User.js";
 
+import { PythonShell } from "python-shell";
+
 app.use(cookieParser());
+
 app.use(express.urlencoded({ extended: false }));
 app.use(
   cors({
@@ -135,51 +138,51 @@ app.post("/login", async (req, res) => {
 
 app.post("/addemployee", async (req, res) => {
   try {
-    const { emloyeename, age, businessTravel,dailyRate,department , distanceFromHome, education,educationField,
-      employeeNumber, environmentSatisfaction,gender,hourlyRate,jobInvolvement, jobLevel,jobRole,jobSatisfaction,maritalStatus,
-      monthlyIncome,monthlyRate,numCompaniesWorked,over18, overTime, percentSalaryHike, performanceRating,relationshipSatisfaction,standardHours,
-      stockOptionLevel, totalWorkingYears,trainingTimesLastYear, workLifeBalance,yearsAtCompany,yearsInCurrentRole,yearsSinceLastPromotion,
-      yearsWithCurrManager, CreatedbyUser
+    const { emloyeename, Age, BusinessTravel,DailyRate,Department , DistanceFromHome, Education,EducationField,
+      EmployeeNumber, EnvironmentSatisfaction,Gender,HourlyRate,JobInvolvement, JobLevel,JobRole,JobSatisfaction,MaritalStatus,
+      MonthlyIncome,MonthlyRate,NumCompaniesWorked,Over18, OverTime, PercentSalaryHike, PerformanceRating,RelationshipSatisfaction,StandardHours,
+      StockOptionLevel, TotalWorkingYears,TrainingTimesLastYear, WorkLifeBalance,YearsAtCompany,YearsInCurrentRole,YearsSinceLastPromotion,
+      YearsWithCurrManager, CreatedbyUser
     } = req.body;
 
  
     // Create a new user
     const newEmployee = new employeeModel({
       emloyeename,
-      age,
-      businessTravel,
-      dailyRate,
-      department,
-      distanceFromHome,
-      education,
-      educationField,
+      Age,
+      BusinessTravel,
+      DailyRate,
+      Department,
+      DistanceFromHome,
+      Education,
+      EducationField,
       
-      employeeNumber,
-      environmentSatisfaction,
-      gender,
-      hourlyRate,
-      jobInvolvement,
-      jobLevel, 
-      jobRole,
-      jobSatisfaction,
-      maritalStatus,
-      monthlyIncome,
-      monthlyRate,
-      numCompaniesWorked,
-      over18,
-      overTime,
-      percentSalaryHike,
-      performanceRating,
-      relationshipSatisfaction,
-      standardHours,
-      stockOptionLevel,
-      totalWorkingYears,
-      trainingTimesLastYear,
-      workLifeBalance,
-      yearsAtCompany,
-      yearsInCurrentRole,
-      yearsSinceLastPromotion,
-      yearsWithCurrManager,
+      EmployeeNumber,
+      EnvironmentSatisfaction,
+      Gender,
+      HourlyRate,
+      JobInvolvement,
+      JobLevel, 
+      JobRole,
+      JobSatisfaction,
+      MaritalStatus,
+      MonthlyIncome,
+      MonthlyRate,
+      NumCompaniesWorked,
+      Over18,
+      OverTime,
+      PercentSalaryHike,
+      PerformanceRating,
+      RelationshipSatisfaction,
+      StandardHours,
+      StockOptionLevel,
+      TotalWorkingYears,
+      TrainingTimesLastYear,
+      WorkLifeBalance,
+      YearsAtCompany,
+      YearsInCurrentRole,
+      YearsSinceLastPromotion,
+      YearsWithCurrManager,
       CreatedbyUser
     });
 
@@ -428,7 +431,7 @@ app.get("/deaprtmentemployee/:department", async (req, res) => {
   let body = req.body;
   const Department = req.params.department;
   try {
-    const result = await employeeModel.find({department : Department}).exec(); // Using .exec() to execute the query
+    const result = await employeeModel.find({Department : Department}).exec(); // Using .exec() to execute the query
     console.log(Department);
     res.send({
       message: "Got all Emloyees successfully",
@@ -525,6 +528,77 @@ app.get("/api/v1/profile", (req, res) => {
   getData();
 });
 
+import { spawn } from "child_process";
+
+app.get("/predict/:id", async (req, res) => {
+  let body = req.body;
+  const ID = req.params.id;
+  const pickleFilePath =  path.join('D:\React projects\Fy Hr Forcast\hr forcast backend\Models\scaler.pkl');
+
+
+  try {
+    const result = await employeeModel.findOne({_id : ID}).exec(); // Using .exec() to execute the query
+    console.log('res',result.emloyeename);
+    const options = {
+      args: [JSON.stringify(result)],
+    };
+    console.log("opt",options)
+    PythonShell.run(
+      path.join('D:','React projects','Fy Hr Forcast','hr forcast backend', 'Models','scaler.pkl'),
+      options,
+      (err, results) => {
+        if (err) {
+          console.error('Error:', err.message);
+          res.status(500).json({ error: 'Internal Server Error' });
+          return;
+        }
+
+        const predictionResult = JSON.parse(results[0]);
+        res.json({ prediction: predictionResult });
+      }
+    );
+    res.send({
+      message: "Got Emloyees successfully",
+      data: result,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      message: "Server error",
+    });
+  }
+});
+
+app.get('/predicts/:id', async (req, res) => {
+  let body = req.body;
+  const ID = req.params.id;
+  const pickleFilePath = path.join('index.js', 'Models', 'scaler.pkl');  try {
+    const result = await employeeModel.findOne({_id : ID}).exec(); // Using .exec() to execute the query
+    console.log('res',result.emloyeename);
+    const options = {
+      args: [JSON.stringify(result)],
+    };
+    console.log("opt",options)
+
+    PythonShell.run(
+      path.join( 'D:','React projects','Fy Hr Forcast','hr forcast backend','predict_script.py'),
+      options,
+      (err, results) => {
+        if (err) {
+          console.error('Error:', err.message);
+          res.status(500).json({ error: 'Internal Server Error' });
+          return;
+        }
+
+        const predictionResult = JSON.parse(results[0]);
+        res.json({ prediction: predictionResult });
+      }
+    );
+  } catch (error) {
+    console.error('Error:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
