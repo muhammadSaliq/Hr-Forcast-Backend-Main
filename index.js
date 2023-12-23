@@ -241,6 +241,7 @@ app.put("/editemployee/:id", async (req,res) => {
   const updatedEmloyeeData = req.body;
   const UpdatedbyUser = req.body.UpdatedbyUser
 console.log("empid",employeeId)
+console.log("dta",updatedEmloyeeData)
 console.log("upsr",UpdatedbyUser)
 
   try{
