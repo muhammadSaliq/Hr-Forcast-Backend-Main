@@ -600,6 +600,24 @@ app.get('/predicts/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+// alert
+app.get("/employeealert", async (req, res) => {
+
+  try {
+    const result1 = await employeeModel.find({ EnvironmentSatisfaction : 1, JobInvolvement: 1, JobSatisfaction: 1 }).exec(); // Using .exec() to execute the query
+    // console.log(result);
+    res.send({
+      message: "Got all employee successfully",
+      data: result1,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      message: "Server error",
+    });
+  }
+});
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
