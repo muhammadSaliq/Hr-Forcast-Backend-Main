@@ -338,15 +338,25 @@ app.get("/geteditdepaprtment/:id", async (req,res) => {
 
   res.send({message: "customer found", Product : department})
 });
-app.put("/editdepartment/:id", async (req,res) => {
+app.put("/editdepartment/:id/:name/:old", async (req,res) => {
 
   const depId = req.params.id;
+  const depname = req.params.name;
+  const depoldname = req.params.old;
+
   const updatedDepartmentData = req.body;
+  console.log("deps", updatedDepartmentData.departmentname)
+  console.log("depnames", depname)
 
   try{
+    const result = await employeeModel.find({Department : depname}).exec();
   const departmentData = await departmentModel.findByIdAndUpdate(depId, updatedDepartmentData, {
     new: true, // Return the updated departmentData
   });
+  await employeeModel.updateMany(
+    { Department: depoldname },
+    { $set: { Department: depname } }
+  );
   if (!departmentData) {
     return res.status(404).json({ message: 'department Data not found' });
   }
@@ -365,14 +375,14 @@ app.get("/deletedepartment/:id/:name", async (req, res) => {
 console.log("dep", name)
   try {
     const FindData = await departmentModel.findById({ _id: id });
-    const result = await employeeModel.find({department : name}).exec();
+    const result = await employeeModel.find({Department : name}).exec();
     console.log("res", result)
 
     if (FindData) {
      // FindData.isApproved = true;
    await FindData.updateOne({ executive: "0" });
    await employeeModel.updateMany(
-    { department: name },
+    { Department: name },
     { $set: { executive: "0" } }
   );
 
@@ -406,7 +416,7 @@ app.get("/activedepartment/:id/:name", async (req, res) => {
      // FindData.isApproved = true;
    await FindData.updateOne({ executive: "1" });
    await employeeModel.updateMany(
-    { department: name },
+    { Department: name },
     { $set: { executive: "1" } }
   );
       res.send({
