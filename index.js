@@ -1,22 +1,16 @@
 import express from "express";
 import User from "./Models/User.js"; // Adjust the path based on your directory structure
-import bcrypt from "bcrypt";
-import crypto from "crypto"; // Import the 'crypto' module
 import jwt from "jsonwebtoken"; // Import the jsonwebtoken library
-import nodemailer from "nodemailer";
 const app = express();
 const port = process.env.PORT || 8000; // Use process.env.PORT for flexibility
 import cors from "cors";
 const SECRET = process.env.SECRET || "topsecret";
 import cookieParser from "cookie-parser";
 import multer from "multer";
-import bucket from "./Bucket/Firebase.js";
-import fs from "fs";
-import path from "path";
 import { employeeModel } from "./Models/User.js";
 import { departmentModel } from "./Models/User.js";
 
-import { PythonShell } from "python-shell";
+
 
 app.use(cookieParser());
 
@@ -40,7 +34,7 @@ app.get("/", (req, res) => {
   res.send("Final Year Project ");
 });
 
-//users
+//hr users signup
 app.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -69,11 +63,14 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+// hr user login
 app.post("/login", async (req, res) => {
   try {
+    // get data from body
     let body = req.body;
     body.email = body.email.toLowerCase();
 
+    //validation
     if (!body.email || !body.password) {
       res.status(400).send(`required fields missing, request example: ...`);
       return;
@@ -90,6 +87,7 @@ app.post("/login", async (req, res) => {
       console.log("User Successfully Logged In !");
       console.log("data: ", data);
 
+      //json web token data
       const token = jwt.sign(
         {
           _id: data._id,
@@ -102,6 +100,7 @@ app.post("/login", async (req, res) => {
 
       console.log("token: ", token);
 
+      // setting cookies 
       res.cookie("Token", token, {
         maxAge: 86_400_000,
         httpOnly: true,
@@ -109,6 +108,7 @@ app.post("/login", async (req, res) => {
         secure: true,
       });
 
+      // on successfull login, these cookies are set
       res.send({
         message: "login successful",
         profile: {
@@ -138,6 +138,7 @@ app.post("/login", async (req, res) => {
 
 app.post("/addemployee", async (req, res) => {
   try {
+    // get data from body
     const { emloyeename, Age, BusinessTravel,DailyRate,Department , DistanceFromHome, Education,EducationField,
       EmployeeNumber, EnvironmentSatisfaction,Gender,HourlyRate,JobInvolvement, JobLevel,JobRole,JobSatisfaction,MaritalStatus,
       MonthlyIncome,MonthlyRate,NumCompaniesWorked,Over18, OverTime, PercentSalaryHike, PerformanceRating,RelationshipSatisfaction,StandardHours,
@@ -196,10 +197,10 @@ app.post("/addemployee", async (req, res) => {
   }
 });
 
+// api to get all active emloyees
 app.get("/allemployees", async (req, res) => {
   try {
     const result = await employeeModel.find({ executive: "1" }).exec(); // Using .exec() to execute the query
-    // console.log(result);
     res.send({
       message: "Got all employee successfully",
       data: result,
@@ -212,10 +213,11 @@ app.get("/allemployees", async (req, res) => {
 
   }
 });
+
+// all inactive employees
 app.get("/allemployeesbench", async (req, res) => {
   try {
     const result = await employeeModel.find({ executive: "0" }).exec(); // Using .exec() to execute the query
-    // console.log(result);
     res.send({
       message: "Got all employee successfully",
       data: result,
@@ -228,6 +230,8 @@ app.get("/allemployeesbench", async (req, res) => {
 
   }
 });
+
+// get single employee by id to edit
   app.get("/geteditemployee/:id", async (req,res) => {     
 
     const EmpId = req.params.id;
@@ -235,6 +239,8 @@ app.get("/allemployeesbench", async (req, res) => {
   
     res.send({message: "customer found", Product : Employee})
   });
+
+  // edit employee data
 app.put("/editemployee/:id", async (req,res) => {
 
   const employeeId = req.params.id;
@@ -245,9 +251,11 @@ console.log("dta",updatedEmloyeeData)
 console.log("upsr",UpdatedbyUser)
 
   try{
+    //find by employee id and update
   const employeeData = await employeeModel.findByIdAndUpdate(employeeId, updatedEmloyeeData, {
     new: true, // Return the updated employeeData
   });
+  //if employee not found
   if (!employeeData) {
     return res.status(404).json({ message: 'employee Data not found' });
   }
@@ -261,14 +269,17 @@ catch {
 
 });
 
+// api to delete employee by setting executive to 0
+
 app.get("/deleteemployee/:id", async (req, res) => {
   const id = req.params.id;
 
   try {
+    //find employee
     const FindData = await employeeModel.findById({ _id: id });
 
+    // updating executive
     if (FindData) {
-     // FindData.isApproved = true;
    await FindData.updateOne({ executive: "0" });
       res.send({
         message: "Employee deleted successfully",
@@ -289,15 +300,17 @@ app.get("/deleteemployee/:id", async (req, res) => {
 
 });
 
-//department
+//adding new department
 app.post("/adddepartments", async (req, res) => {
 
   try {
+    // get dep data from body
     const { departmentname, contact, departmentmanager, description  } = req.body;
     const existingUser = await departmentModel.findOne({ departmentname });
 
+    // no dep with same name can be added
     if (existingUser) {
-      return res.status(400).json({ error: "Email already exists" });
+      return res.status(400).json({ error: "department already exists" });
     }
  
     const newDepartment = new departmentModel({
@@ -316,10 +329,11 @@ app.post("/adddepartments", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+//get all department from DB 
 app.get("/alldepartments", async (req, res) => {
   try {
     const result = await departmentModel.find().exec(); // Using .exec() to execute the query
-    // console.log(result);
     res.send({
       message: "Got all department successfully",
       data: result,
@@ -331,6 +345,8 @@ app.get("/alldepartments", async (req, res) => {
     });
   }
 });
+
+//get single department to edit them
 app.get("/geteditdepaprtment/:id", async (req,res) => {     
 
   const DepId = req.params.id;
@@ -338,24 +354,32 @@ app.get("/geteditdepaprtment/:id", async (req,res) => {
 
   res.send({message: "customer found", Product : department})
 });
+
+// api to edit the department
 app.put("/editdepartment/:id/:name/:old", async (req,res) => {
 
-  const depId = req.params.id;
-  const depname = req.params.name;
-  const depoldname = req.params.old;
+  // get data from params
+  const depId = req.params.id; // dep id
+  const depname = req.params.name; //new dep name
+  const depoldname = req.params.old; // old dep name
 
+// get updated data from header
   const updatedDepartmentData = req.body;
+  // to see data in console
   console.log("deps", updatedDepartmentData.departmentname)
   console.log("depnames", depname)
 
   try{
-    const result = await employeeModel.find({Department : depname}).exec();
+    const result = await employeeModel.find({Department : depname}).exec();  
+
+    //ffind dep and updating it with new data
   const departmentData = await departmentModel.findByIdAndUpdate(depId, updatedDepartmentData, {
     new: true, // Return the updated departmentData
   });
+  //updating employee's department with updated department name
   await employeeModel.updateMany(
-    { Department: depoldname },
-    { $set: { Department: depname } }
+    { Department: depoldname },  // find emp by old name
+    { $set: { Department: depname } }  // setting the new updated data
   );
   if (!departmentData) {
     return res.status(404).json({ message: 'department Data not found' });
@@ -369,18 +393,23 @@ catch {
 
 
 });
+
+
+// set department as inactive
+
 app.get("/deletedepartment/:id/:name", async (req, res) => {
   const id = req.params.id;
   const name = req.params.name;
 console.log("dep", name)
-  try {
+  try { // find emp and dep data
     const FindData = await departmentModel.findById({ _id: id });
     const result = await employeeModel.find({Department : name}).exec();
     console.log("res", result)
 
     if (FindData) {
-     // FindData.isApproved = true;
-   await FindData.updateOne({ executive: "0" });
+      
+   await FindData.updateOne({ executive: "0" });  // setting department as inactive
+   // setting all employee in the current dep as inactive
    await employeeModel.updateMany(
     { Department: name },
     { $set: { executive: "0" } }
@@ -405,6 +434,8 @@ console.log("dep", name)
   }
 
 });
+
+//api to activate department
 app.get("/activedepartment/:id/:name", async (req, res) => {
   const id = req.params.id;
   const name = req.params.name;
@@ -413,8 +444,11 @@ app.get("/activedepartment/:id/:name", async (req, res) => {
     const FindData = await departmentModel.findById({ _id: id });
 
     if (FindData) {
-     // FindData.isApproved = true;
+
+     // activating department
    await FindData.updateOne({ executive: "1" });
+
+   //activating employee of current dep
    await employeeModel.updateMany(
     { Department: name },
     { $set: { executive: "1" } }
@@ -437,7 +471,7 @@ app.get("/activedepartment/:id/:name", async (req, res) => {
   }
 
 });
-// display employee by department
+// display employees in current department 
 app.get("/deaprtmentemployee/:department", async (req, res) => {
   let body = req.body;
   const Department = req.params.department;
@@ -455,6 +489,8 @@ app.get("/deaprtmentemployee/:department", async (req, res) => {
     });
   }
 });
+
+//ai to get the parameters of a single employee
 app.get("/employeedetails/:id", async (req, res) => {
   let body = req.body;
   const ID = req.params.id;
@@ -472,6 +508,8 @@ app.get("/employeedetails/:id", async (req, res) => {
     });
   }
 });
+
+// api to verify json web token
 app.use("/api/v1", (req, res, next) => {
   console.log("req.cookies: ", req.cookies.Token);
 
@@ -508,8 +546,12 @@ app.use("/api/v1", (req, res, next) => {
     }
   });
 });
+
+// api to get user profile
 app.get("/api/v1/profile", (req, res) => {
   const _id = req.body.token._id;
+
+  // getting hr user data
   const getData = async () => {
     try {
       const user = await User.findOne(
@@ -539,82 +581,12 @@ app.get("/api/v1/profile", (req, res) => {
   getData();
 });
 
-import { spawn } from "child_process";
 
-app.get("/predict/:id", async (req, res) => {
-  let body = req.body;
-  const ID = req.params.id;
-  const pickleFilePath =  path.join('D:\React projects\Fy Hr Forcast\hr forcast backend\Models\scaler.pkl');
-
-
-  try {
-    const result = await employeeModel.findOne({_id : ID}).exec(); // Using .exec() to execute the query
-    console.log('res',result.emloyeename);
-    const options = {
-      args: [JSON.stringify(result)],
-    };
-    console.log("opt",options)
-    PythonShell.run(
-      path.join('D:','React projects','Fy Hr Forcast','hr forcast backend', 'Models','scaler.pkl'),
-      options,
-      (err, results) => {
-        if (err) {
-          console.error('Error:', err.message);
-          res.status(500).json({ error: 'Internal Server Error' });
-          return;
-        }
-
-        const predictionResult = JSON.parse(results[0]);
-        res.json({ prediction: predictionResult });
-      }
-    );
-    res.send({
-      message: "Got Emloyees successfully",
-      data: result,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send({
-      message: "Server error",
-    });
-  }
-});
-
-app.get('/predicts/:id', async (req, res) => {
-  let body = req.body;
-  const ID = req.params.id;
-  const pickleFilePath = path.join('index.js', 'Models', 'scaler.pkl');  try {
-    const result = await employeeModel.findOne({_id : ID}).exec(); // Using .exec() to execute the query
-    console.log('res',result.emloyeename);
-    const options = {
-      args: [JSON.stringify(result)],
-    };
-    console.log("opt",options)
-
-    PythonShell.run(
-      path.join( 'D:','React projects','Fy Hr Forcast','hr forcast backend','predict_script.py'),
-      options,
-      (err, results) => {
-        if (err) {
-          console.error('Error:', err.message);
-          res.status(500).json({ error: 'Internal Server Error' });
-          return;
-        }
-
-        const predictionResult = JSON.parse(results[0]);
-        res.json({ prediction: predictionResult });
-      }
-    );
-  } catch (error) {
-    console.error('Error:', error.message);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-// alert
+// alert hr if emp abot to leave
 app.get("/employeealert", async (req, res) => {
 
   try {
+    // gettng data using 3 main parameters
     const result1 = await employeeModel.find({ EnvironmentSatisfaction : 1, JobInvolvement: 1, JobSatisfaction: 1 }).exec(); // Using .exec() to execute the query
     // console.log(result);
     res.send({
