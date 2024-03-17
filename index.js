@@ -6,7 +6,6 @@ const port = process.env.PORT || 8000; // Use process.env.PORT for flexibility
 import cors from "cors";
 const SECRET = process.env.SECRET || "topsecret";
 import cookieParser from "cookie-parser";
-import multer from "multer";
 import { employeeModel } from "./Models/User.js";
 import { departmentModel } from "./Models/User.js";
 
@@ -21,14 +20,6 @@ app.use(
     credentials: true,
   })
 );
-const storage = multer.diskStorage({
-  destination: "/tmp",
-  filename: function (req, file, cb) {
-    console.log("mul-file: ", file);
-    cb(null, `${new Date().getTime()}-${file.originalname}`);
-  },
-});
-const upload = multer({ storage });
 app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Final Year Project ");
@@ -600,6 +591,30 @@ app.get("/employeealert", async (req, res) => {
     });
   }
 });
+
+//search employee
+
+app.get("/api/searchlist", async (req, res) => {
+  const searchParams = {};
+      console.log("src",req.query)
+
+  // Check if query parameters exist and add them to the search parameters
+  if (req.query.emloyeename) {
+    searchParams.emloyeename = new RegExp(req.query.emloyeename, "i");
+  }
+  if (req.query.Department) {
+    searchParams.Department = new RegExp(req.query.Department, "i");
+  }
+
+  try {
+    const results = await employeeModel.find(searchParams);
+    console.log("inside try", results)
+    res.json(results);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
