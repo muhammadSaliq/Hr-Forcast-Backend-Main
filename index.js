@@ -16,7 +16,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 app.use(
   cors({
-    origin: ["http://localhost:3000", "*"],
+    origin: true,
     credentials: true,
   })
 );
@@ -599,8 +599,17 @@ app.get("/api/searchlist", async (req, res) => {
       console.log("src",req.query)
 
   // Check if query parameters exist and add them to the search parameters
-  if (req.query.emloyeename) {
-    searchParams.emloyeename = new RegExp(req.query.emloyeename, "i");
+  if (req.query.EmployeeNumber) {
+    searchParams.EmployeeNumber = new RegExp(req.query.EmployeeNumber, "i");
+  }
+  if (req.query.Age) {
+    searchParams.Age = { $lte: parseInt(req.query.Age) };
+  }
+  if (req.query.JobRole) {
+    searchParams.JobRole = new RegExp(req.query.JobRole, "i");
+  }
+  if (req.query.Gender) {
+    searchParams.Gender = new RegExp(req.query.Gender, "i");
   }
   if (req.query.Department) {
     searchParams.Department = new RegExp(req.query.Department, "i");
@@ -608,7 +617,7 @@ app.get("/api/searchlist", async (req, res) => {
 
   try {
     const results = await employeeModel.find(searchParams);
-    console.log("inside try", results)
+    //console.log("inside try", results)
     res.json(results);
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
