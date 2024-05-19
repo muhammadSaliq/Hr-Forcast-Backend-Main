@@ -59,6 +59,9 @@ app.post("/login", async (req, res) => {
   try {
     // get data from body
     let body = req.body;
+    console.log("ss")
+    console.log("sasa", body)
+
     body.email = body.email.toLowerCase();
 
     //validation
@@ -190,6 +193,7 @@ app.post("/addemployee", async (req, res) => {
 
 // api to get all active emloyees
 app.get("/allemployees", async (req, res) => {
+  console.log("all emp api running")
   try {
     const result = await employeeModel.find({ executive: "1" }).exec(); // Using .exec() to execute the query
     res.send({
@@ -337,6 +341,152 @@ app.get("/alldepartments", async (req, res) => {
   }
 });
 
+//total counts
+app.get("/employeedepartmentstotal", async (req, res) => {
+  try {
+    const hrresult = await employeeModel.find({Department: "HR Department"}).exec(); // Using .exec() to execute the query
+    const result = await employeeModel.find({Department: "IT Department"}).exec();
+    const result2 = await employeeModel.find({Department: "Financial department"}).exec();
+    const result3 = await employeeModel.find({Department: "Strategic division"}).exec();
+    const result4 = await employeeModel.find({Department: "IT"}).exec();
+    const result5 = await employeeModel.find({Department: "Kiet Departments of Sciences"}).exec();
+    const counthr= hrresult.length
+    const countit= result.length
+    const countfi= result2.length
+    const countitde= result4.length
+    const countki= result5.length
+    const countst= result3.length
+
+    res.send({
+      message: "Got all department successfully",
+      hrtotal: counthr,
+      itreasult: countit,
+      fitotal: countfi,
+      sttotal: countst,
+      itdeptotal: countitde,
+      kitotal: countki,
+      
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      message: "Server error",
+    });
+  }
+});
+
+app.get("/employeeducationfieldtotal", async (req, res) => {
+  try {
+    const lsresult = await employeeModel.find({EducationField: "Life Sciences"}).exec(); // Using .exec() to execute the query
+    const result = await employeeModel.find({EducationField: "Medical"}).exec();
+    const result2 = await employeeModel.find({EducationField: "Marketing"}).exec();
+    const result3 = await employeeModel.find({EducationField: "Technical Degree"}).exec();
+    const result4 = await employeeModel.find({EducationField: "Human Resources"}).exec();
+    const result5 = await employeeModel.find({EducationField: "Other"}).exec();
+    const countls= lsresult.length
+    const countme= result.length
+    const countmar= result2.length
+    const counthr= result4.length
+    const countot= result5.length
+    const counttd= result3.length
+
+    res.send({
+      message: "Got all department successfully",
+      lstotal: countls,
+      mereasult: countme,
+      martotal: countmar,
+      tdtotal: counttd,
+      hrtotal: counthr,
+      ottotal: countot,
+      
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      message: "Server error",
+    });
+  }
+});
+
+app.get("/employeejobroletotal", async (req, res) => {
+  try {
+    const hrresult = await employeeModel.find({JobRole: "Sales Executive"}).exec(); // Using .exec() to execute the query
+    const result = await employeeModel.find({JobRole: "Research Scientist"}).exec();
+    const result2 = await employeeModel.find({JobRole: "Laboratory Technician"}).exec();
+    const result3 = await employeeModel.find({JobRole: "Manufacturing Director"}).exec();
+    const result4 = await employeeModel.find({JobRole: "Healthcare Representative"}).exec();
+    const result5 = await employeeModel.find({JobRole: "Manager"}).exec();
+    const result6 = await employeeModel.find({JobRole: "Sales Representative"}).exec();
+    const result7 = await employeeModel.find({JobRole: "Research Director"}).exec();
+    const result8 = await employeeModel.find({JobRole: "Human Resources"}).exec();
+    const countse= hrresult.length
+    const countresci= result.length
+    const countlt= result2.length
+    const counthr= result4.length
+    const countman= result5.length
+    const countmd= result3.length
+    const countsr= result6.length
+    const countrd= result7.length
+    const counthres= result8.length
+
+    res.send({
+      message: "Got all department successfully",
+      setotal: countse,
+      rescireasult: countresci,
+      lttotal: countlt,
+      mdtotal: countmd,
+      hrdeptotal: counthr,
+      mantotal: countman,
+      srtotal: countsr,
+      rdtotal: countrd,
+      restotal: counthres
+      
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      message: "Server error",
+    });
+  }
+});
+
+app.get("/employeegendertotal", async (req, res) => {
+  try {
+    const lsresult = await employeeModel.find({Gender: "Male"}).exec(); // Using .exec() to execute the query
+    const result = await employeeModel.find({Gender: "Female"}).exec();
+    const result2 = await employeeModel.find({MaritalStatus: "Single"}).exec();
+    const result3 = await employeeModel.find({MaritalStatus: "Married"}).exec();
+    const result4 = await employeeModel.find({MaritalStatus: "Divorced"}).exec();
+    const result5 = await employeeModel.find({Over18: "Yes"}).exec();
+    const result6 = await employeeModel.find({Over18: "No"}).exec();
+
+    const countmale= lsresult.length
+    const countfemale= result.length
+    const countsingle= result2.length
+    const countmarried= result3.length
+    const countdivorced= result4.length
+    const count18a= result5.length
+    const count18b= result6.length
+   
+
+    res.send({
+      message: "Got all department successfully",
+      maletotal: countmale,
+      femalereasult: countfemale,
+      singletotal: countsingle,
+      marriedtotal: countmarried,
+      divorcedtotal: countdivorced,
+      ageatotal: count18a,
+      agebtotal: count18b
+
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      message: "Server error",
+    });
+  }
+});
 //get single department to edit them
 app.get("/geteditdepaprtment/:id", async (req,res) => {     
 
@@ -623,6 +773,68 @@ app.get("/api/searchlist", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+
+app.post("/logouts", async (req, res) => {
+  try {
+    let body = req.body;
+    body.email = body.email.toLowerCase();
+
+
+
+    // check if user exists
+    const data = await User.findOne(
+      { email: body.email },
+      "username email password"
+    );
+
+    if (data && body.password === data.password) {
+      // user found
+      console.log("User Successfully Logged out !");
+      console.log("data: ", data);
+
+      const token = jwt.sign(
+        {
+          _id: data._id,
+          email: data.email,
+          iat: 0,
+          exp: 0,
+        },
+        SECRET
+      );
+
+      console.log("token: ", token);
+
+      res.cookie("Token", token, {
+        maxAge: 0,
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+      });
+ 
+      res.send({
+        message: "login successful",
+        profile: {
+          email: data.email,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          age: data.age,
+          _id: data._id,
+        },
+      });
+
+      return;
+    } else {
+      // user not found
+      console.log("user not found");
+      res.status(401).send({ message: "Incorrect email or password" });
+    }
+  } catch (error) {
+    console.log("error: ", error);
+    res.status(500).send({ message: "login failed, please try later" });
+  }
+});
+
 
 // Start the server
 app.listen(port, () => {
