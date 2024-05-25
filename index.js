@@ -419,6 +419,7 @@ app.get("/employeejobroletotal", async (req, res) => {
     const result6 = await employeeModel.find({JobRole: "Sales Representative"}).exec();
     const result7 = await employeeModel.find({JobRole: "Research Director"}).exec();
     const result8 = await employeeModel.find({JobRole: "Human Resources"}).exec();
+
     const countse= hrresult.length
     const countresci= result.length
     const countlt= result2.length
@@ -459,6 +460,8 @@ app.get("/employeegendertotal", async (req, res) => {
     const result4 = await employeeModel.find({MaritalStatus: "Divorced"}).exec();
     const result5 = await employeeModel.find({Over18: "Yes"}).exec();
     const result6 = await employeeModel.find({Over18: "No"}).exec();
+    const result8 = await employeeModel.find().exec();
+    const result9 = await departmentModel.find().exec();
 
     const countmale= lsresult.length
     const countfemale= result.length
@@ -467,8 +470,8 @@ app.get("/employeegendertotal", async (req, res) => {
     const countdivorced= result4.length
     const count18a= result5.length
     const count18b= result6.length
-   
-
+    const totalemloyees= result8.length
+const totaldep= result9.length
     res.send({
       message: "Got all department successfully",
       maletotal: countmale,
@@ -477,8 +480,9 @@ app.get("/employeegendertotal", async (req, res) => {
       marriedtotal: countmarried,
       divorcedtotal: countdivorced,
       ageatotal: count18a,
-      agebtotal: count18b
-
+      agebtotal: count18b,
+      totalemloyees: totalemloyees,
+      totaldep: totaldep
     });
   } catch (err) {
     console.error(err);
@@ -487,6 +491,7 @@ app.get("/employeegendertotal", async (req, res) => {
     });
   }
 });
+
 //get single department to edit them
 app.get("/geteditdepaprtment/:id", async (req,res) => {     
 
