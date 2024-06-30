@@ -460,7 +460,7 @@ app.get("/employeegendertotal", async (req, res) => {
     const result4 = await employeeModel.find({MaritalStatus: "Divorced"}).exec();
     const result5 = await employeeModel.find({Over18: "Yes"}).exec();
     const result6 = await employeeModel.find({Over18: "No"}).exec();
-    const result8 = await employeeModel.find().exec();
+    const result8 = await employeeModel.find({executive: "1"}).exec();
     const result9 = await departmentModel.find().exec();
 
     const countmale= lsresult.length
@@ -727,6 +727,25 @@ app.get("/api/v1/profile", (req, res) => {
   getData();
 });
 
+
+app.get("/alerttotal", async (req, res) => {
+
+  try {
+    // gettng data using 3 main parameters
+    const result1 = await employeeModel.find({ EnvironmentSatisfaction : 1, JobInvolvement: 1, JobSatisfaction: 1 }).exec(); // Using .exec() to execute the query
+    // console.log(result);
+    const result= result1.length
+    res.send({
+      message: "Got all employee successfully",
+      data: result,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      message: "Server error",
+    });
+  }
+});
 
 // alert hr if emp abot to leave
 app.get("/employeealert", async (req, res) => {
